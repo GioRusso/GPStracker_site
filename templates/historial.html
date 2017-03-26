@@ -1,0 +1,176 @@
+{% extends "header.html" %}
+{% load staticfiles %}
+{% load static %}
+
+{% block content %}
+<!-- Include Required Prerequisites -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+ 
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+{% csrf_token %}
+<style>
+    #map {
+        position: relative;
+        padding-bottom: 25%; // This is the aspect ratio
+        height: 0;
+        overflow: hidden;
+    }
+</style>
+
+<div class="content-section-a">
+	<div class="container">
+	<h3>Historial de posiciones</h3>
+	
+	{% comment %}
+	{{syrus_data.first.date|date:"Y-m-d H:i:s"}}
+	{{#syrus_data.first.date|date:'c'#}}
+	{#2017-03-01T23:30:18#}
+	{% endcomment %}
+
+	<br><label>Fechas: </label>
+<!--   <script> console.log("holi" + "{{syrus_data|first|date }}")</script>
+	<input type="date" id="start_date" value="{{syrus_data.first.date|date:'Y-m-d'}}">
+	<input type="time" id="start_time" value="{{syrus_data.first.date|date:'H:i:s'}}"> 
+	<br><label>Fecha final: </label>
+	<input type="date" id="end_date" value="{{syrus_data.last.date|date:'Y-m-d'}}">
+	<input type="time" id="end_time" value="{{syrus_data.last.date|date:'H:i:s'}}"> --> 
+  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i><input class="input-mini" type="text" id="calendario">
+  <br><input type="range" id="points" min="1" max="{{syrus_data|length}}" step="1">
+</div>
+
+
+<div id="map"></div>
+
+<script type="text/javascript">
+  $('#calendario').daterangepicker({
+    "timePicker": true,
+    "ranges": {
+      'Hoy': [moment(), moment()],
+      'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+      'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
+      'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
+      'Este mes': [moment().startOf('month'), moment().endOf('month')],
+      'Mes anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    },
+    "alwaysShowCalendars": true,
+    "startDate": moment().subtract(29, 'days'),
+    "endDate": moment()
+}, function(start, end, label) {
+  "#2017-03-01T23:30:18"
+  console.log('New date range selected: ' + start.format('YYYY-MM-DDTHH:mm:ss') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+  run(start.format('YYYY-MM-DDTHH:mm:ss'),end.format('YYYY-MM-DDTHH:mm:ss'));
+});
+</script>
+
+<script>
+var poly;
+var Smarker;var Emarker;
+var marker;
+var map;
+var coordenadas = [];
+var fechas = [];
+function initMap() {
+  //var coordenadas = []; //[{lat: 37.772, lng: -122.214}];
+  {% for s in syrus_data %}
+	coordenadas.push({lat: {{s.latitude}}, lng: {{s.longitude}}});
+  fechas.push("{{s.date}}");
+  {% endfor %}
+  if (coordenadas.length==0) {coordenadas = [{lat: 11.019632, lng: -74.851054}];}
+  var numDatos = Object.keys(coordenadas).length;
+  var index_centro = parseInt(numDatos/2);
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 18,
+    center: coordenadas[index_centro],
+    zoomControl: true,
+    zoomControlOptions: {
+        position: google.maps.ControlPosition.LEFT_CENTER
+    },
+    scaleControl: true,
+    streetViewControl: false,
+  });
+  trazarRecorrido(coordenadas,fechas);
+}
+
+function trazarRecorrido(coordenades, dates) {
+	coordenadas = coordenades;
+  fechas = dates;
+	if (coordenadas.length==0) {coordenadas = [{lat: 11.019632, lng: -74.851054}];}
+  console.log(coordenades)
+  poly = new google.maps.Polyline({
+    path: coordenades,
+    geodesic: true,
+    strokeColor: '#FF0000',
+    strokeOpacity: 1.0, 	
+    strokeWeight: 2
+  });
+  var numDatos = Object.keys(coordenades).length;
+  var index_centro = parseInt(numDatos/2);
+
+  Emarker = new google.maps.Marker({
+    position: coordenades[numDatos-1],
+    map: map,
+    icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+  });
+  Smarker = new google.maps.Marker({
+    position: coordenades[0],
+    map: map,
+    icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+  });
+    marker = new google.maps.Marker({
+    position: coordenadas[0],
+    map: map,
+    icon: '{% static 'img/truck.png' %}'
+  });
+  //map.setCenter = coordenades[index_centro];
+  poly.setMap(map);
+  document.getElementById("points").max = numDatos;
+  document.getElementById("points").value = 1;
+}
+
+var input = document.getElementById('points');
+input.addEventListener('input', function(){puntos();});
+
+function run(start_date, end_date) {
+	//var start_date = $('#start_date').val() + " " + $('#start_time').val(); // get the current value of the input field.
+  //var end_date = $('#end_date').val() + " " +  $('#end_time').val();
+  	$.ajax({
+        type: "GET",
+        url: {% url 'fechas' %}/,
+        data: {'start_date':start_date, 'end_date':end_date}
+    })
+    .done(function(response) {
+    	if (response['puntos'].length =! 0){
+        	//$('#reloadmapa').replaceWith(response);
+        	poly.setMap(null);
+        	marker.setMap(null); Smarker.setMap(null); Emarker.setMap(null);
+        	trazarRecorrido(eval(response['puntos']),eval(response['date']));
+    	}
+    });
+}
+
+ var contentString = '<p>Holiii</p>';
+ var infowindow;
+
+
+function puntos(){
+	marker.setMap(null);
+	var punto = document.getElementById("points").value;
+	marker = new google.maps.Marker({
+		position: coordenadas[punto-1],
+		map: map,
+    icon: '{% static 'img/truck.png' %}',
+    title: fechas[punto-1]
+	});
+}
+
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCf8jZcZuQrOVqDTov37awP6tPLUHw_NAU&callback=initMap"></script>
+
+
+
+{% endblock %}
