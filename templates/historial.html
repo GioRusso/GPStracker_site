@@ -8,16 +8,31 @@
 <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
  
 <!-- Include Date Range Picker -->
-<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<script type="text/javascript" src="{% static 'js/calendario.js' %}"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js"></script>
 <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/css/bootstrap-slider.min.css" />
 
 {% csrf_token %}
 <style>
     #map {
         position: relative;
-        padding-bottom: 25%; // This is the aspect ratio
-        height: 0;
+        padding-bottom: 40%;
+        height: 100%;
         overflow: hidden;
+    }
+    #info-box {
+        background-color: white;
+        border: 1px solid black;
+        bottom: 200px;
+        height: 40px;
+        padding: 10px;
+        margin: 1% 1%;
+        position: absolute;
+        left: 30px;
+    }
+    .slider-selection {
+      background: #BABABA;
     }
 </style>
 
@@ -31,40 +46,29 @@
 	{#2017-03-01T23:30:18#}
 	{% endcomment %}
 
-	<br><label>Fechas: </label>
+	<br>
 <!--   <script> console.log("holi" + "{{syrus_data|first|date }}")</script>
 	<input type="date" id="start_date" value="{{syrus_data.first.date|date:'Y-m-d'}}">
 	<input type="time" id="start_time" value="{{syrus_data.first.date|date:'H:i:s'}}"> 
 	<br><label>Fecha final: </label>
 	<input type="date" id="end_date" value="{{syrus_data.last.date|date:'Y-m-d'}}">
 	<input type="time" id="end_time" value="{{syrus_data.last.date|date:'H:i:s'}}"> --> 
-  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i><input class="input-mini" type="text" id="calendario">
-  <br><input type="range" id="points" min="1" max="{{syrus_data|length}}" step="1">
+  <div class="input-group" style="width: 35%; position: relative;">
+    <span class="input-group-addon">Rango de fechas</span>
+    <input class="form-control" type="text" id="calendario">
+    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+  </div>
+
+  <input id="points" data-slider-id='ex1Slider' type="text" data-slider-min="1" data-slider-max="{{syrus_data|length}}" data-slider-step="1" data-slider-value="1"/>
+  
+  <!-- <br><input type="range" id="points" min="1" max="{{syrus_data|length}}" step="1"> -->
 </div>
 
 
 <div id="map"></div>
+<div id="info-box">?</div>
 
-<script type="text/javascript">
-  $('#calendario').daterangepicker({
-    "timePicker": true,
-    "ranges": {
-      'Hoy': [moment(), moment()],
-      'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-      'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
-      'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
-      'Este mes': [moment().startOf('month'), moment().endOf('month')],
-      'Mes anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-    },
-    "alwaysShowCalendars": true,
-    "startDate": moment().subtract(29, 'days'),
-    "endDate": moment()
-}, function(start, end, label) {
-  "#2017-03-01T23:30:18"
-  console.log('New date range selected: ' + start.format('YYYY-MM-DDTHH:mm:ss') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-  run(start.format('YYYY-MM-DDTHH:mm:ss'),end.format('YYYY-MM-DDTHH:mm:ss'));
-});
-</script>
+<script type="text/javascript" src="{% static 'js/historial.js' %}"></script>
 
 <script>
 var poly;
@@ -73,10 +77,12 @@ var marker;
 var map;
 var coordenadas = [];
 var fechas = [];
+var puntos_Slider = $('#points').slider()
+
 function initMap() {
   //var coordenadas = []; //[{lat: 37.772, lng: -122.214}];
   {% for s in syrus_data %}
-	coordenadas.push({lat: {{s.latitude}}, lng: {{s.longitude}}});
+  coordenadas.push({lat: {{s.latitude}}, lng: {{s.longitude}}});
   fechas.push("{{s.date}}");
   {% endfor %}
   if (coordenadas.length==0) {coordenadas = [{lat: 11.019632, lng: -74.851054}];}
@@ -96,15 +102,15 @@ function initMap() {
 }
 
 function trazarRecorrido(coordenades, dates) {
-	coordenadas = coordenades;
+  coordenadas = coordenades;
   fechas = dates;
-	if (coordenadas.length==0) {coordenadas = [{lat: 11.019632, lng: -74.851054}];}
+  if (coordenadas.length==0) {coordenadas = [{lat: 11.019632, lng: -74.851054}];}
   console.log(coordenades)
   poly = new google.maps.Polyline({
     path: coordenades,
     geodesic: true,
     strokeColor: '#FF0000',
-    strokeOpacity: 1.0, 	
+    strokeOpacity: 1.0,   
     strokeWeight: 2
   });
   var numDatos = Object.keys(coordenades).length;
@@ -127,45 +133,45 @@ function trazarRecorrido(coordenades, dates) {
   });
   //map.setCenter = coordenades[index_centro];
   poly.setMap(map);
-  document.getElementById("points").max = numDatos;
-  document.getElementById("points").value = 1;
+  /*document.getElementById("points").max = numDatos;
+  document.getElementById("points").value = 1;*/
+  puntos_Slider.slider({max: numDatos})
+  puntos_Slider.slider('setValue',1)
 }
 
-var input = document.getElementById('points');
-input.addEventListener('input', function(){puntos();});
-
 function run(start_date, end_date) {
-	//var start_date = $('#start_date').val() + " " + $('#start_time').val(); // get the current value of the input field.
+  //var start_date = $('#start_date').val() + " " + $('#start_time').val(); // get the current value of the input field.
   //var end_date = $('#end_date').val() + " " +  $('#end_time').val();
-  	$.ajax({
+    $.ajax({
         type: "GET",
         url: {% url 'fechas' %}/,
         data: {'start_date':start_date, 'end_date':end_date}
     })
     .done(function(response) {
-    	if (response['puntos'].length =! 0){
-        	//$('#reloadmapa').replaceWith(response);
-        	poly.setMap(null);
-        	marker.setMap(null); Smarker.setMap(null); Emarker.setMap(null);
-        	trazarRecorrido(eval(response['puntos']),eval(response['date']));
-    	}
+      if (response['puntos'].length =! 0){
+          //$('#reloadmapa').replaceWith(response);
+          poly.setMap(null);
+          marker.setMap(null); Smarker.setMap(null); Emarker.setMap(null);
+          trazarRecorrido(eval(response['puntos']),eval(response['date']));
+      }
     });
 }
 
- var contentString = '<p>Holiii</p>';
- var infowindow;
-
-
-function puntos(){
-	marker.setMap(null);
-	var punto = document.getElementById("points").value;
-	marker = new google.maps.Marker({
-		position: coordenadas[punto-1],
-		map: map,
+$("#points").on("slide", function(slideEvt) {
+    marker.setMap(null);
+    var punto = document.getElementById("points").value;
+    document.getElementById('info-box').textContent = "Fecha: " + fechas[punto-1];
+    marker = new google.maps.Marker({
+    position: coordenadas[punto-1],
+    map: map,
     icon: '{% static 'img/truck.png' %}',
-    title: fechas[punto-1]
-	});
-}
+  });
+  puntos_Slider.slider({
+  formatter: function(value) {
+    return 'Fecha: ' + fechas[value-1];
+  }
+  });
+});
 
 </script>
 
@@ -174,3 +180,26 @@ function puntos(){
 
 
 {% endblock %}
+
+
+<script type="text/javascript">
+  $('#calendario').daterangepicker({
+    "timePicker": true,
+    "ranges": {
+      'Hoy': [moment(), moment()],
+      'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+      'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
+      'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
+      'Este mes': [moment().startOf('month'), moment().endOf('month')],
+      'Mes anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    },
+    "alwaysShowCalendars": true,
+    "startDate": moment().subtract(29, 'days'),
+    "endDate": moment()
+}, function(start, end, label) {
+  "#2017-03-01T23:30:18"
+  console.log('New date range selected: ' + start.format('YYYY-MM-DDTHH:mm:ss') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+  run(start.format('YYYY-MM-DDTHH:mm:ss'),end.format('YYYY-MM-DDTHH:mm:ss'));
+});
+</script>
+
