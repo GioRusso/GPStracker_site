@@ -1,0 +1,221 @@
+{% extends "header.html" %}
+{% load staticfiles %}
+{% load static %}
+
+{% block content %}
+
+    <!-- Header -->
+    
+    <div class="intro-header">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="intro-message">
+                        <h1>El camión del Tío</h1>
+                        <h3>Geolocalización en vivo de sus camiones</h3>
+                        <hr class="intro-divider">
+                        <ul class="list-inline intro-social-buttons">
+                            <li>
+                                <a href="https://twitter.com/SBootstrap" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/RaptrX/GPStracker_site" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                            </li>
+                         <h2>TUTORIAL</h2>
+                         <h3>Vea una simple muestra de como utilizar nuestros servicios abajo</h3>   
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.intro-header -->
+
+    <!-- Page Content -->
+
+
+    <a  name="services"></a>
+    <div class="content-section-a">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">No pierda de vista su vehículo, seguimiento en tiempo real</h2>
+                    <p class="lead">1. Al hacer click en la pestaña "¿Donde está mi carro?" podrá ver en tiempo real la ubicacion y movimiento del vehículo.</p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+            
+                    <img class="img-responsive" src="{% static 'img/dondeest.gif' %}" alt="">
+                </div>
+                </div>
+                 
+             </div>
+         </div>
+
+
+        <div class="container">
+             <div class="row">
+                  <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <p class="lead">2. El cursor y un mapa muestran la posición de forma gráfica y simple de interpretar.</p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="{% static 'img/esta.gif' %}" alt="">
+                </div>
+              </div>
+        </div>
+
+    </div>
+
+    <div class="content-section-b">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading"> Historial de recorridos del vehículo<br></h2>
+                    <p class="lead">1. Al hacer click en la pestaña de "¿Donde ha estado mi carro?" podrá acceder al historial de posiciones.</p>
+                </div>
+                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                    <img class="img-responsive" src="{% static 'img/dondeha.gif' %}" alt="">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="container">
+             <div class="row">
+                  <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <p class="lead">2. Para seleccionar el rango de fechas entre las que desea visualizar los recorridos solo debe dar click en las fechas para modificarlas en el calendario desplegable.</p>
+                </div>
+                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                    <img class="img-responsive" src="{% static 'img/fecha.gif' %}" alt="">
+                </div>
+              </div>
+        </div>
+
+
+        <div class="container">
+             <div class="row">
+                  <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <p class="lead">3. Una vez escogida la fecha, con el slider que esta abajo de esta puede mover el indicador del vehículo en el trayecto para saber en que momento específico se registró cada posición.</p>
+                </div>
+                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                    <img class="img-responsive" src="{% static 'img/slider.gif' %}" alt="">
+                </div>
+              </div>
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-b -->
+
+    <div class="content-section-a">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">¿Alguna zona en específico que quiera revisar?<br></h2>
+                    <p class="lead">La pestaña de "¿Ha estado mi carro en esta zona?" le permite delimitar una zona del mapa en la que le gustaría ver si su vehículo ha estado. </p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="{% static 'img/estazona.gif' %}" alt="">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="container">
+             <div class="row">
+                  <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <p class="lead">2. Solo debe con el rectangulo demarcar el espacio deseado.</p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="{% static 'img/esta.gif' %}" alt="">
+                </div>
+              </div>
+        </div>
+
+        <div class="container">
+             <div class="row">
+                  <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <p class="lead">3. Los indicadores le proporcionaran algo de información extra para que sepa en que momento se registró cada posicíon en la zona.</p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="{% static 'img/esta.gif' %}" alt="">
+                </div>
+              </div>
+        </div>
+
+    </div>
+
+    <a name="about"></a>
+    <div class="content-section-a">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Contacto</h2>
+                    <p class="lead">Para contactarnos escribir a alguno de los siguientes correos:
+                    dcatherine@uninorte.edu.co, sorelyss@uninorte.edu.co</p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+            
+                    <img class="img-responsive" src="{% static 'img/dondeest.gif' %}" alt="">
+                </div>
+                </div>
+                 
+             </div>
+         </div>
+    </div>
+
+    <a  name="contact"></a>
+    <div class="banner">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2>Haga click para saber más de nuestro servicio:</h2>
+                </div>
+                <div class="col-lg-6">
+                    <ul class="list-inline banner-social-buttons">
+                        <li>
+                            <a href="https://twitter.com/SBootstrap" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/RaptrX/GPStracker_site" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                        </li>
+                       
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.banner -->
+{% endblock %}
