@@ -78,7 +78,7 @@ var map;
 var coordenadas = [];
 var fechas = [];
 var puntos_Slider = $('#points').slider()
-
+var bounds;
 function initMap() {
   //var coordenadas = []; //[{lat: 37.772, lng: -122.214}];
   {% for s in syrus_data %}
@@ -133,6 +133,12 @@ function trazarRecorrido(coordenades, dates) {
   });
   //map.setCenter = coordenades[index_centro];
   poly.setMap(map);
+  bounds = new google.maps.LatLngBounds();
+  poly.getPath().forEach(function(e){//can't do polyline.getPath()[i] because it's a MVCArray
+          bounds.extend(e);
+      })         
+  map.fitBounds(bounds);
+
   /*document.getElementById("points").max = numDatos;
   document.getElementById("points").value = 1;*/
   puntos_Slider.slider({max: numDatos})
