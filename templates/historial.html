@@ -85,12 +85,11 @@ function initMap() {
   coordenadas.push({lat: {{s.latitude}}, lng: {{s.longitude}}});
   fechas.push("{{s.date}}");
   {% endfor %}
-  if (coordenadas.length==0) {coordenadas = [{lat: 11.019632, lng: -74.851054}];}
+  //if (coordenadas.length==0) {alert("coordenadas vacias");coordenadas = [{lat: 11.019632, lng: -74.851054}];}
   var numDatos = Object.keys(coordenadas).length;
-  var index_centro = parseInt(numDatos/2);
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 18,
-    center: coordenadas[index_centro],
+    zoom: 20,
+    center: {lat: 11.019632, lng: -74.851054},
     zoomControl: true,
     zoomControlOptions: {
         position: google.maps.ControlPosition.LEFT_CENTER
@@ -102,52 +101,55 @@ function initMap() {
 }
 
 function trazarRecorrido(coordenades, dates) {
-  coordenadas = coordenades;
   fechas = dates;
-  if (coordenadas.length==0) {coordenadas = [{lat: 11.019632, lng: -74.851054}];}
-  console.log(coordenades)
-  poly = new google.maps.Polyline({
-    path: coordenades,
-    geodesic: true,
-    strokeColor: '#FF0000',
-    strokeOpacity: 1.0,   
-    strokeWeight: 2
-  });
-  var numDatos = Object.keys(coordenades).length;
-  var index_centro = parseInt(numDatos/2);
+  coordenadas = coordenades;
+  var numDatos = Object.keys(coordenadas).length;
+  if (numDatos!=0){    
+    poly = new google.maps.Polyline({
+      path: coordenades,
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 1.0,   
+      strokeWeight: 2
+    });
+    var index_centro = parseInt(numDatos/2);
+    if (coordenadas.length>1) {
+      Emarker = new google.maps.Marker({
+        position: coordenades[numDatos-1],
+        map: map,
+        icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+      });
+      Smarker = new google.maps.Marker({
+        position: coordenades[0],
+        map: map,
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+      });
+    }
+      marker = new google.maps.Marker({
+      position: coordenadas[0],
+      map: map,
+      icon: '{% static 'img/truck.png' %}'
+    });
+    poly.setMap(map);
+    bounds = new google.maps.LatLngBounds();
+    coordenades.forEach(function(e){bounds.extend(e);})         
+    map.fitBounds(bounds);
 
-  Emarker = new google.maps.Marker({
-    position: coordenades[numDatos-1],
-    map: map,
-    icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-  });
-  Smarker = new google.maps.Marker({
-    position: coordenades[0],
-    map: map,
-    icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-  });
-    marker = new google.maps.Marker({
-    position: coordenadas[0],
-    map: map,
-    icon: '{% static 'img/truck.png' %}'
-  });
-  //map.setCenter = coordenades[index_centro];
-  poly.setMap(map);
-  bounds = new google.maps.LatLngBounds();
-  poly.getPath().forEach(function(e){//can't do polyline.getPath()[i] because it's a MVCArray
-          bounds.extend(e);
-      })         
-  map.fitBounds(bounds);
-
-  /*document.getElementById("points").max = numDatos;
-  document.getElementById("points").value = 1;*/
-  puntos_Slider.slider({max: numDatos})
-  puntos_Slider.slider('setValue',1)
+    /*document.getElementById("points").max = numDatos;
+    document.getElementById("points").value = 1;*/
+    puntos_Slider.slider({max: numDatos})
+    puntos_Slider.slider('setValue',1)
+  }
+  else {
+    map.setOptions({
+    maxZoom: 18,
+    minZoom: 10
+    });
+  }
+  runPuntos();
 }
 
 function run(start_date, end_date) {
-  //var start_date = $('#start_date').val() + " " + $('#start_time').val(); // get the current value of the input field.
-  //var end_date = $('#end_date').val() + " " +  $('#end_time').val();
     $.ajax({
         type: "GET",
         url: {% url 'fechas' %}/,
@@ -164,48 +166,28 @@ function run(start_date, end_date) {
 }
 
 $("#points").on("slide", function(slideEvt) {
-    marker.setMap(null);
-    var punto = document.getElementById("points").value;
-    document.getElementById('info-box').textContent = "Fecha: " + fechas[punto-1];
-    marker = new google.maps.Marker({
-    position: coordenadas[punto-1],
-    map: map,
-    icon: '{% static 'img/truck.png' %}',
+runPuntos();
+});
+
+function runPuntos(){
+  marker.setMap(null);
+  var punto = document.getElementById("points").value;
+  if(Object.keys(coordenadas).length==0){document.getElementById('info-box').textContent = "No hay coordenadas para este rango de fechas";}
+  else {document.getElementById('info-box').textContent = "Fecha: " + fechas[punto-1];}
+  marker = new google.maps.Marker({
+  position: coordenadas[punto-1],
+  map: map,
+  icon: '{% static 'img/truck.png' %}',
   });
   puntos_Slider.slider({
   formatter: function(value) {
-    return 'Fecha: ' + fechas[value-1];
+    return "Fecha: " + fechas[value-1];
   }
   });
-});
+}
 
 </script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCf8jZcZuQrOVqDTov37awP6tPLUHw_NAU&callback=initMap"></script>
 
-
-
 {% endblock %}
-
-
-<script type="text/javascript">
-  $('#calendario').daterangepicker({
-    "timePicker": true,
-    "ranges": {
-      'Hoy': [moment(), moment()],
-      'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-      'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
-      'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
-      'Este mes': [moment().startOf('month'), moment().endOf('month')],
-      'Mes anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-    },
-    "alwaysShowCalendars": true,
-    "startDate": moment().subtract(29, 'days'),
-    "endDate": moment()
-}, function(start, end, label) {
-  "#2017-03-01T23:30:18"
-  console.log('New date range selected: ' + start.format('YYYY-MM-DDTHH:mm:ss') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-  run(start.format('YYYY-MM-DDTHH:mm:ss'),end.format('YYYY-MM-DDTHH:mm:ss'));
-});
-</script>
-
