@@ -54,13 +54,14 @@
 	<input type="date" id="end_date" value="{{syrus_data.last.date|date:'Y-m-d'}}">
 	<input type="time" id="end_time" value="{{syrus_data.last.date|date:'H:i:s'}}"> --> 
   <div class="input-group" style="width: 35%; position: relative;">
-    <span class="input-group-addon">Rango de fechas</span>
-    <input class="form-control" type="text" id="calendario">
     <span class="input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+    <span class="input-group-addon">Seleccione Fecha y Hora:</span>
+    <input class="form-control" type="text" id="calendario">    
   </div>
-
-  <input id="points" data-slider-id='ex1Slider' type="text" data-slider-min="1" data-slider-max="{{syrus_data|length}}" data-slider-step="1" data-slider-value="1"/>
-  
+  <div class="input-group" style="width: 35%; position: relative;">
+	  <span class="input-group-addon">Desplace la posición del indicador:</span>
+  	<input id="points" data-slider-id='ex1Slider' type="text" data-slider-min="1" data-slider-max="{{syrus_data|length}}" data-slider-step="1" data-slider-value="1"/>
+  </div>
   <!-- <br><input type="range" id="points" min="1" max="{{syrus_data|length}}" step="1"> -->
 </div>
 
