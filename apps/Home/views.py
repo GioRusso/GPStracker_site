@@ -69,7 +69,7 @@ def Area(request):
 	#COMO FUNCIONA: syrus_data = models.Data.objects.filter(latitude__range=("+10.998","+10.999"),longitude__range=("-74.80722","-74.80730"))
 	print syrus_data
 	enviar = [{'lat': str(s.latitude), 'lng': str(s.longitude)} for s in syrus_data]
-	dic_fechas = [s.date for s in syrus_data]
+	dic_fechas = [s.date.strftime("%B %d, %Y, %I:%M%p") for s in syrus_data]
 	return JsonResponse({'puntos':str(enviar).replace("'",""), 'fechas': dic_fechas})
 
 def Historial_Area(request):
