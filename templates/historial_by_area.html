@@ -36,7 +36,7 @@ function initMap() {
   var numDatos = Object.keys(coordenadas).length;
   var index_centro = parseInt(numDatos/2);
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 18,
+    zoom: 10,
     center: coordenadas[index_centro],
     zoomControl: true,
     zoomControlOptions: {
