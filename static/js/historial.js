@@ -13,6 +13,6 @@ $('#calendario').daterangepicker({
     "endDate": moment()
 }, function(start, end, label) {
   "#2017-03-01T23:30:18"
-  console.log('New date range selected: ' + start.format('YYYY-MM-DDTHH:mm:ss') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+  console.log([moment().subtract(24, 'hours'), moment(),moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days')]);
   run(start.format('YYYY-MM-DDTHH:mm:ss'),end.format('YYYY-MM-DDTHH:mm:ss'));
 });
