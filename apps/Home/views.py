@@ -22,6 +22,24 @@ def Fechas(request):
 	dic_fechas = [s.date.strftime("%B %d, %Y, %I:%M%p") for s in syrus_data]
 	return JsonResponse({'puntos': str(enviar).replace("'",""), 'date': dic_fechas})
 
+
+def Historial_Cel(request):
+	end = datetime.now()
+	start = datetime.now() - timedelta(weeks=4)
+	syrus_data = models.Data.objects.raw("SELECT * FROM android_data WHERE (date BETWEEN '%s' AND '%s') ORDER BY date;"%(start,end))
+	for s in syrus_data:
+		print(s.gps_id)
+	return render(request, 'historial_cel.html',{'syrus_data':syrus_data})
+
+def Fechas_Cel(request):
+	start_date = request.GET['start_date']
+	end_date = request.GET['end_date']
+	syrus_data = models.Data.objects.raw("SELECT * FROM android_data WHERE (date BETWEEN '%s' AND '%s') ORDER BY date;"%(start_date,end_date))
+	enviar = [{'lat': str(s.longitude), 'lng': str(s.latitude)} for s in syrus_data]
+	dic_fechas = [s.date.strftime("%B %d, %Y, %I:%M%p") for s in syrus_data]
+	return JsonResponse({'puntos': str(enviar).replace("'",""), 'date': dic_fechas})
+
+
 def TiempoReal(request):
 	syrus_data = models.Data.objects.last()
 	return render(request, 'real_time.html',{'s':syrus_data})
@@ -44,12 +62,14 @@ def Historial_by_area(request):
 def Area(request):
 	start_lat = request.GET['start_lat']; start_lng = request.GET['start_lng']
 	end_lat = request.GET['end_lat']; end_lng = request.GET['end_lng']
+	start_lat= "+"+start_lat
+	end_lat= "+"+end_lat
 	syrus_data = models.Data.objects.filter(latitude__range=(start_lat, end_lat),longitude__range=(start_lng, end_lng)).order_by('date')
+	#SELECT * FROM Home_data WHERE (latitude BETWEEN 11.0196 AND 11.0198) AND (longitude BETWEEN -74.8508 AND -74.8506); 
+	#COMO FUNCIONA: syrus_data = models.Data.objects.filter(latitude__range=("+10.998","+10.999"),longitude__range=("-74.80722","-74.80730"))
+	print syrus_data
 	enviar = [{'lat': str(s.latitude), 'lng': str(s.longitude)} for s in syrus_data]
-	print enviar
 	dic_fechas = [s.date for s in syrus_data]
-	#return render(request, 'fecha.html', {'syrus_data': syrus_data})
-	#return HttpResponse(str(enviar).replace("'",""))
 	return JsonResponse({'puntos':str(enviar).replace("'",""), 'fechas': dic_fechas})
 
 def Historial_Area(request):
