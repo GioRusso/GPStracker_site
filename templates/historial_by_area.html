@@ -107,6 +107,7 @@ function run(lat1,lat2,lng1,lng2) {
             marker = new google.maps.Marker({
               position: eval(response['puntos'])[i],
               map: map,
+	      title: "Fecha: " + response['fecha'][i],
               icon: '{% static 'img/truck.png' %}'
             });
           }
