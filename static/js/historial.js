@@ -1,7 +1,7 @@
 $('#calendario').daterangepicker({
     "timePicker": true,
     "ranges": {
-      'Hoy': [moment().startOf('day'), moment()],
+      'Hoy': [moment().subtract(24, 'hours'), moment()],
       'Ayer': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days')],
       'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
       'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
