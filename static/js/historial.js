@@ -12,6 +12,5 @@ $('#calendario').daterangepicker({
     "startDate": moment().subtract(29, 'days'),
     "endDate": moment()
 }, function(start, end, label) {
-  console.log([moment().subtract(24, 'hours'), moment(),moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days')]);
   run(start.format('YYYY-MM-DDTHH:mm:ss'),end.format('YYYY-MM-DDTHH:mm:ss'));
 });
