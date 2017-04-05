@@ -109,11 +109,13 @@ function trazarRecorrido(coordenades, dates) {
       Emarker = new google.maps.Marker({
         position: coordenades[numDatos-1],
         map: map,
+        title: 'Fin del recorrido'
         icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
       });
       Smarker = new google.maps.Marker({
         position: coordenades[0],
         map: map,
+        title: 'Inicio del recorrido'
         icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
       });
     }
