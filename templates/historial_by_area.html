@@ -11,6 +11,15 @@
         height: 0;
         overflow: hidden;
     }
+    #info-box {
+        background-color: white;
+        border: 1px solid black;
+        bottom: 30px;
+        height: 20px;
+        padding: 10px;
+        position: absolute;
+        left: 30px;
+    }
 </style>
 
 <div class="content-section-a">
@@ -20,7 +29,7 @@
 </div>
 
 <div id="map"></div>
-
+<div id="info-box">?</div>
 
 
 <script>
@@ -85,7 +94,7 @@ function run(lat1,lat2,lng1,lng2) {
   	$.ajax({
         type: "GET",
         url: {% url 'area' %}/,
-        data: {'start_lat':lat1, 'end_lat':lat2, 'start_lng':lng1, 'end_lng':lng2}
+        data: {'start_lat':lat2, 'end_lat':lat1, 'start_lng':lng2, 'end_lng':lng1}
     })
     .done(function(response) {
     	if (response){
