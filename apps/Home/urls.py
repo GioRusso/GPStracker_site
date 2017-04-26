@@ -15,4 +15,7 @@ urlpatterns = [
     url(r'^areaquery', views.Area, name = 'area'),
     url(r'^historial_And_Area$', views.Historial_Area, name = 'historial_area'),
     url(r'^dat_area', views.Fechas_Area, name = 'fechas_area'),
+    
+    url(r'^elevacion$', views.Elevacion, name = 'elevacion'),
+    url(r'^elevation$', views.Elevation, name = 'elevation'),
 ]
