@@ -90,3 +90,15 @@ def Fechas_Area(request):
 	enviar = [{'lat': str(s.latitude), 'lng': str(s.longitude)} for s in syrus_data]
 	dic_fechas = [s.date for s in syrus_data]
 	return JsonResponse({'puntos': str(enviar).replace("'",""), 'date': dic_fechas})
+
+def Elevacion(request):
+	end = datetime.now()
+	start = datetime.now() - timedelta(weeks=3)
+	syrus_data = models.Data.objects.filter(date__range=(str(start),str(end))).order_by('date')
+	return render(request, 'elevacion.html',{'syrus_data':syrus_data})
+
+def Elevation(request):
+	end = datetime.now()
+	start = datetime.now() - timedelta(weeks=3)
+	syrus_data = models.Data.objects.filter(date__range=(str(start),str(end))).order_by('date')
+	return render(request, 'elevation.html',{'syrus_data':syrus_data})
