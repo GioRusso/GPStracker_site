@@ -11,16 +11,16 @@ def Historial(request):
 	end = datetime.now()
 	start = datetime.now() - timedelta(weeks=4)
 	syrus_data = models.Data.objects.filter(date__range=(str(start),str(end))).order_by('date')
-	return render(request, 'historial.html',{'syrus_data':syrus_data})
+	return render(request, 'altura.html',{'syrus_data':syrus_data})
 
 def Fechas(request):
 	start_date = request.GET['start_date']
-	print start_date
 	end_date = request.GET['end_date']
 	syrus_data = models.Data.objects.filter(date__range=(start_date, end_date)).order_by('date')
 	enviar = [{'lat': str(s.latitude), 'lng': str(s.longitude)} for s in syrus_data]
 	dic_fechas = [s.date.strftime("%B %d, %Y, %I:%M%p") for s in syrus_data]
-	return JsonResponse({'puntos': str(enviar).replace("'",""), 'date': dic_fechas})
+	alturas = [s.elevation for s in syrus_data]
+	return JsonResponse({'puntos': str(enviar).replace("'",""), 'date': dic_fechas, 'alturas': alturas})
 
 
 def Historial_Cel(request):
@@ -51,7 +51,7 @@ def Update(request):
 	if s.id > current_id:
 		enviar = "({lat: %s, lng: %s})"%(s.latitude, s.longitude)
 		#return HttpResponse(enviar)
-		return JsonResponse({'puntos': enviar, 'id':s.id, 'date': s.date.strftime("%I:%M%p")})
+		return JsonResponse({'puntos': enviar, 'id':s.id, 'date': s.date, 'elevation': s.elevation})
 	else:
 		return HttpResponse("no")
 
