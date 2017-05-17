@@ -129,7 +129,7 @@ function trazarRecorrido(coordenades, dates) {
 function run(start_date, end_date) {
     $.ajax({
         type: "GET",
-        url: {% url 'altura' %}/,
+        url: {% url 'fechas' %}/,
         data: {'start_date':start_date, 'end_date':end_date}
     })
     .done(function(response) {
