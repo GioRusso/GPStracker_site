@@ -3,36 +3,50 @@
 {% load static %}
 
 {% block content %}
-
 <style>
-	#map {
-		width:80%;
-		height:75%;
-		margin-left:auto; 
-		margin-right: auto;
-		float: none;
-	}
+    #info-box {
+        background-color: white;
+        border: 1px solid black;
+        bottom: 600px;
+        height: 60px;
+        padding: 5px;
+        margin: 8% 13%;
+        position: absolute;
+        left: 30px;
+    }
+    #map {
+        position: relative;
+        padding-bottom: 25%; // This is the aspect ratio
+        height: 0;
+        overflow: hidden;
+    }
 </style>
 
-<div class="content-section-a" style="background-color: white;">
+<div class="content-section-b">
 	<div class="container">
 	<h3>Última Posición Registrada</h3>
-	</div>
+	<br>
 </div>
 
 <div id="map"></div>
+<div id="info-box"></div>
+<div id="elevation_chart"></div>
 
-
+<script src="https://www.google.com/jsapi"></script>
 <script>
+google.load("visualization", "1", {packages: ["corechart"]});
 var poly;
 var marker;
 var map;
 var coordenadas = [];
 var fecha = '{{s.date|date:'H:i:s'}}';
+var altura;
+var chart;
+
 function initMap() {
   //var coordenadas = []; //[{lat: 37.772, lng: -122.214}];
   coordenadas.push({lat: {{s.latitude}}, lng: {{s.longitude}}});
-
+  altura = {{s.elevation}};
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 18,
     center: coordenadas[0],
@@ -43,6 +57,7 @@ function initMap() {
     scaleControl: true,
     streetViewControl: false,
   });
+  plotElevation(altura); 
   trazarRecorrido(coordenadas);
 }
 
@@ -62,23 +77,42 @@ function trazarRecorrido(coordenades) {
 
   marker = new google.maps.Marker({
     position: coordenades[numDatos-1],
-    title: "Hora: " + fecha,
+    title: 'Hora: ' + fecha,
     map: map
   });
   //map.setCenter = coordenades[index_centro];
   poly.setMap(map);
+
+  document.getElementById('info-box').innerHTML = "Fecha: " + fecha + "<br>Altura: " + altura;
+  chart.setSelection([{row:numDatos-1, column:1}]);
   console.log("que pasa3?")
 }
 
+function plotElevation(elevations) {
+  altura = elevations;
+  var chartDiv = document.getElementById('elevation_chart');
+  chart = new google.visualization.ColumnChart(chartDiv);
+  var data = new google.visualization.DataTable();
+  
+  data.addColumn('string', 'Fecha');
+  data.addColumn('number', 'Altura');
+  for (var i = 0; i < elevations.length; i++) {
+    data.addRow([fecha[i], Number(elevations[i])]);
+  }
 
-function puntos(){
-	marker.setMap(null);
-	var punto = document.getElementById("points").value;
-	marker = new google.maps.Marker({
-		position: coordenadas[punto-1],
-		map: map
-	});
+  // Draw the chart using the data within its DIV.
+  chart.draw(data, {
+    height: 200,
+    legend: 'none',
+    titleY: 'Altura (m)',
+    tooltip: { trigger: 'selection' },
+    hAxis: {
+      baselineColor: 'none',
+      ticks: []
+    }
+  });
 }
+
 var current_id = {{ s.id }};
 setInterval(function() {
     $.ajax({
@@ -101,7 +135,9 @@ setInterval(function() {
         	coordenadas.push(eval(response['puntos']));
     			current_id = response['id'];
     			fecha = response['date'];
-    			trazarRecorrido(coordenadas);
+          altura = response['elevation'];    			
+          plotElevation(altura); 
+          trazarRecorrido(coordenadas);
     	}
     });
 }, 5000)
@@ -112,5 +148,3 @@ setInterval(function() {
 
 
 {% endblock %}
-
-
