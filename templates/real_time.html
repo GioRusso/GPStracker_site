@@ -45,6 +45,8 @@ var chart;
 var data;
 function initMap() {
   data = new google.visualization.DataTable();
+  data.addColumn('string', 'Fecha');
+  data.addColumn('number', 'Altura');
   //var coordenadas = []; //[{lat: 37.772, lng: -122.214}];
   coordenadas.push({lat: {{s.latitude}}, lng: {{s.longitude}}});
   altura = {{s.elevation}};
@@ -89,10 +91,7 @@ function plotElevation(elevations) {
   altura = elevations;
   var chartDiv = document.getElementById('elevation_chart');
   chart = new google.visualization.ColumnChart(chartDiv);
-  
-  
-  data.addColumn('string', 'Fecha');
-  data.addColumn('number', 'Altura');
+	
   data.addRow([fecha, Number(elevations)]);
   /*for (var i = 0; i < elevations.length; i++) {
     data.addRow([fecha[i], Number(elevations[i])]);
