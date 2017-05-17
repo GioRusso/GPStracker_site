@@ -11,7 +11,7 @@ def Historial(request):
 	end = datetime.now()
 	start = datetime.now() - timedelta(weeks=4)
 	syrus_data = models.Data.objects.filter(date__range=(str(start),str(end))).order_by('date')
-	return render(request, 'altura.html',{'syrus_data':syrus_data})
+	return render(request, 'historial.html',{'syrus_data':syrus_data})
 
 def Fechas(request):
 	start_date = request.GET['start_date']
