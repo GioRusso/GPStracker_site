@@ -17,7 +17,6 @@ urlpatterns = [
     url(r'^dat_area', views.Fechas_Area, name = 'fechas_area'),
 
     url(r'^elevacion$', views.Elevacion, name = 'elevacion'),
-    url(r'^elevation$', views.Elevation, name = 'elevation'),
-
-    url(r'^altura', views.Altura, name = 'altura'),
+    url(r'^altura', views.Altura, name = 'altura')
+    #url(r'^elevation$', views.Elevation, name = 'elevation'),    
 ]
