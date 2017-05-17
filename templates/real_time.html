@@ -96,9 +96,10 @@ function plotElevation(elevations) {
   
   data.addColumn('string', 'Fecha');
   data.addColumn('number', 'Altura');
-  for (var i = 0; i < elevations.length; i++) {
+  data.addRow([fecha, Number(elevations)]);
+  /*for (var i = 0; i < elevations.length; i++) {
     data.addRow([fecha[i], Number(elevations[i])]);
-  }
+  }*/
 
   // Draw the chart using the data within its DIV.
   chart.draw(data, {
