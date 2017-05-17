@@ -164,3 +164,13 @@ def Elevation(request):
 {'latitude':11.005350	,'longitude':-74.835334}
 ]
 	return render(request, 'elevation.html',{'syrus_data':syrus_data})
+
+
+def Altura(request):
+	start_date = request.GET['start_date']
+	end_date = request.GET['end_date']
+	syrus_data = models.Data.objects.filter(date__range=(start_date, end_date)).order_by('date')
+	enviar = [{'lat': str(s.latitude), 'lng': str(s.longitude)} for s in syrus_data]
+	dic_fechas = [s.date.strftime("%B %d, %Y, %I:%M%p") for s in syrus_data]
+	alturas = [s.elevation for s in syrus_data]
+	return JsonResponse({'puntos': str(enviar).replace("'",""), 'date': dic_fechas, 'alturas': alturas})
