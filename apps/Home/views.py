@@ -51,7 +51,7 @@ def Update(request):
 	if s.id > current_id:
 		enviar = "({lat: %s, lng: %s})"%(s.latitude, s.longitude)
 		#return HttpResponse(enviar)
-		return JsonResponse({'puntos': enviar, 'id':s.id, 'date': s.date, 'elevation': s.elevation})
+		return JsonResponse({'puntos': enviar, 'id':s.id, 'date': s.date.strftime("%B %d, %Y, %I:%M%p"), 'elevation': s.elevation})
 	else:
 		return HttpResponse("no")
 
