@@ -18,19 +18,19 @@
     #info-box {
         background-color: white;
         border: 1px solid black;
-        bottom: 50px;
-        height: 40px;
+        bottom: 200px;
+        height: 60px;
         padding: 10px;
         margin: 8% 13%;
         position: absolute;
-        left: 10px;
+        left: 30px;
     }
     .slider-selection {
       background: #BABABA;
     }
 </style>
 
-<div class="content-section-a" style="background-color: white">
+<div class="content-section-a" style="background-color: white;">
   <div class="container">
     <h3>Historial de posiciones</h3>
     <br>
@@ -54,8 +54,9 @@
 
 <div id="map" style="width:80%;height:75%; margin-left: auto; margin-right: auto;float: none;"></div>
 <div id="info-box"></div>
+<div id="elevation_chart"></div>
 
-
+<script src="https://www.google.com/jsapi"></script>
 <script type="text/javascript" src="{% static 'js/historial.js' %}"></script>
 
 <script>
@@ -63,34 +64,18 @@ $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();   
 });
 
+google.load("visualization", "1", {packages: ["corechart"]});
+
 var poly;
 var Smarker;var Emarker;
 var marker;
 var map;
 var coordenadas = [];
 var fechas = [];
+var alturas = [];
 var puntos_Slider = $('#points').slider()
 var bounds;
-function initMap() {
-  //var coordenadas = []; //[{lat: 37.772, lng: -122.214}];
-  {% for s in syrus_data %}
-  coordenadas.push({lat: {{s.latitude}}, lng: {{s.longitude}}});
-  fechas.push("{{s.date}}");
-  {% endfor %}
-  //if (coordenadas.length==0) {alert("coordenadas vacias");coordenadas = [{lat: 11.019632, lng: -74.851054}];}
-  var numDatos = Object.keys(coordenadas).length;
-  map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 20,
-    center: {lat: 11.019632, lng: -74.851054},
-    zoomControl: true,
-    zoomControlOptions: {
-        position: google.maps.ControlPosition.LEFT_CENTER
-    },
-    scaleControl: true,
-    streetViewControl: false,
-  });
-  trazarRecorrido(coordenadas,fechas);
-}
+var chart;
 
 function trazarRecorrido(coordenades, dates) {
   fechas = dates;
@@ -109,13 +94,11 @@ function trazarRecorrido(coordenades, dates) {
       Emarker = new google.maps.Marker({
         position: coordenades[numDatos-1],
         map: map,
-        title: 'Fin del recorrido',
         icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
       });
       Smarker = new google.maps.Marker({
         position: coordenades[0],
         map: map,
-        title: 'Inicio del recorrido',
         icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
       });
     }
@@ -146,7 +129,7 @@ function trazarRecorrido(coordenades, dates) {
 function run(start_date, end_date) {
     $.ajax({
         type: "GET",
-        url: {% url 'fechas' %}/,
+        url: {% url 'altura' %}/,
         data: {'start_date':start_date, 'end_date':end_date}
     })
     .done(function(response) {
@@ -154,20 +137,26 @@ function run(start_date, end_date) {
           //$('#reloadmapa').replaceWith(response);
           poly.setMap(null);
           marker.setMap(null); Smarker.setMap(null); Emarker.setMap(null);
-          trazarRecorrido(eval(response['puntos']),eval(response['date']));
+          fechas = eval(response['date']);
+          plotElevation(eval(response['alturas']));
+          trazarRecorrido(eval(response['puntos']),fechas);
+          
       }
     });
 }
 
 $("#points").on("slide", function(slideEvt) {
-runPuntos();
+  runPuntos();
 });
 
 function runPuntos(){
   marker.setMap(null);
   var punto = document.getElementById("points").value;
   if(Object.keys(coordenadas).length==0){document.getElementById('info-box').textContent = "No hay coordenadas para este rango de fechas";}
-  else {document.getElementById('info-box').textContent = "Fecha: " + fechas[punto-1];}
+  else {
+    document.getElementById('info-box').innerHTML = "Fecha: " + fechas[punto-1] + "<br>Altura: " + alturas[punto-1];
+    chart.setSelection([{row:punto-1, column:1}]);
+  }
   marker = new google.maps.Marker({
   position: coordenadas[punto-1],
   map: map,
@@ -178,6 +167,56 @@ function runPuntos(){
     return "Fecha: " + fechas[value-1];
   }
   });
+}
+
+function plotElevation(elevations) {
+  alturas = elevations;
+  var chartDiv = document.getElementById('elevation_chart');
+  chart = new google.visualization.ColumnChart(chartDiv);
+  var data = new google.visualization.DataTable();
+  
+  data.addColumn('string', 'Fecha');
+  data.addColumn('number', 'Altura');
+  for (var i = 0; i < elevations.length; i++) {
+    data.addRow([fechas[i], Number(elevations[i])]);
+  }
+
+  // Draw the chart using the data within its DIV.
+  chart.draw(data, {
+    height: 200,
+    legend: 'none',
+    titleY: 'Altura (m)',
+    tooltip: { trigger: 'selection' },
+    hAxis: {
+      baselineColor: 'none',
+      ticks: []
+    }
+  });
+}
+
+function initMap() {
+  //var coordenadas = []; //[{lat: 37.772, lng: -122.214}];
+  {% for s in syrus_data %}
+  coordenadas.push({lat: {{s.latitude}}, lng: {{s.longitude}}});
+  fechas.push("{{s.date}}");
+  alturas.push("{{s.elevation}}");
+  {% endfor %}
+  //if (coordenadas.length==0) {alert("coordenadas vacias");coordenadas = [{lat: 11.019632, lng: -74.851054}];}
+  var numDatos = Object.keys(coordenadas).length;
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 20,
+    center: {lat: 11.019632, lng: -74.851054},
+    zoomControl: true,
+    zoomControlOptions: {
+        position: google.maps.ControlPosition.LEFT_CENTER
+    },
+    scaleControl: true,
+    streetViewControl: false,
+    mapTypeId: 'terrain'
+  });
+  
+  plotElevation(alturas); 
+  trazarRecorrido(coordenadas,fechas);  
 }
 
 </script>
